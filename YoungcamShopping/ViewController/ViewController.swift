@@ -53,6 +53,8 @@ class ViewController: UIViewController {
         configureHierarchy()
         configureLayout()
         configureView()
+        
+        callRequest(query: "캠핑카")
     }
     
     func callRequest(query: String) {
@@ -67,11 +69,14 @@ class ViewController: UIViewController {
             switch response.result {
             case .success(let value):
                 productInfoList = value
+                dump(productInfoList)
                 
             case .failure(let error):
                 print("fail", error)
             }
         }
+        
+        dump(#function)
     }
 }
 
@@ -90,6 +95,10 @@ extension ViewController: UISearchBarDelegate {
         
         // MARK: 화면 전환 필요
         callRequest(query: text)
+        
+//        let vc = SearchResultViewController()
+//        vc.navigationController?.pushViewController(vc, animated: true)
+//        present(vc, animated: true)
     }
 }
 

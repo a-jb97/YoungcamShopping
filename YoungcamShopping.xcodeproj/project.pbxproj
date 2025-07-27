@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		9E5525F02E361984000BA035 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9E5525EF2E361984000BA035 /* SnapKit */; };
 		9E5525F32E361998000BA035 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9E5525F22E361998000BA035 /* Alamofire */; };
+		9E5526262E364630000BA035 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9E5526252E364630000BA035 /* Kingfisher */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E5526262E364630000BA035 /* Kingfisher in Frameworks */,
 				9E5525F02E361984000BA035 /* SnapKit in Frameworks */,
 				9E5525F32E361998000BA035 /* Alamofire in Frameworks */,
 			);
@@ -87,6 +89,7 @@
 			packageProductDependencies = (
 				9E5525EF2E361984000BA035 /* SnapKit */,
 				9E5525F22E361998000BA035 /* Alamofire */,
+				9E5526252E364630000BA035 /* Kingfisher */,
 			);
 			productName = YoungcamShopping;
 			productReference = 9E5525712E360F68000BA035 /* YoungcamShopping.app */;
@@ -119,6 +122,7 @@
 			packageReferences = (
 				9E5525EE2E361984000BA035 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				9E5525F12E361998000BA035 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				9E5526242E364630000BA035 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9E5525722E360F68000BA035 /* Products */;
@@ -378,6 +382,14 @@
 				minimumVersion = 5.10.2;
 			};
 		};
+		9E5526242E364630000BA035 /* XCRemoteSwiftPackageReference "Kingfisher" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/onevcat/Kingfisher";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.5.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -390,6 +402,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9E5525F12E361998000BA035 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		9E5526252E364630000BA035 /* Kingfisher */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9E5526242E364630000BA035 /* XCRemoteSwiftPackageReference "Kingfisher" */;
+			productName = Kingfisher;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

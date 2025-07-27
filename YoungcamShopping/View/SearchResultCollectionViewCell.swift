@@ -11,12 +11,16 @@ import SnapKit
 class SearchResultCollectionViewCell: UICollectionViewCell {
     static let identifier = "SearchResultCollectionViewCell"
     
-    let totalLabel = UILabel()
-    let accuracyButton = UIButton()
-    let dateOrderButton = UIButton()
-    let highPriceButton = UIButton()
-    let lowPriceButton = UIButton()
-    let thumbnailImageView = UIImageView()
+    let thumbnailImageView = {
+        let imageView = UIImageView()
+        
+        imageView.clipsToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 15
+        
+        return imageView
+    }()
+    
     let mallNameLabel = UILabel()
     let titleLabel = UILabel()
     let lpriceLabel = UILabel()
@@ -36,15 +40,22 @@ class SearchResultCollectionViewCell: UICollectionViewCell {
 
 extension SearchResultCollectionViewCell: ViewDesignProtocol {
     func configureHierarchy() {
-        <#code#>
+        contentView.addSubview(thumbnailImageView)
+        contentView.addSubview(mallNameLabel)
+        contentView.addSubview(titleLabel)
+        contentView.addSubview(lpriceLabel)
     }
     
     func configureLayout() {
-        <#code#>
+        thumbnailImageView.snp.makeConstraints { make in
+            make.top.equalTo(contentView.safeAreaLayoutGuide).offset(16)
+            make.leading.equalTo(contentView.safeAreaLayoutGuide).inset(16)
+            
+        }
     }
     
     func configureView() {
-        <#code#>
+        thumbnailImageView.contentMode = .scaleAspectFill
     }
     
     
