@@ -7,11 +7,9 @@
 
 import Foundation
 
-var productInfoList: ProductInfo = ProductInfo(total: 0, items: [])
-
 struct ProductInfo: Decodable {
     let total: Int
-    let items: [ProductData]
+    var items: [ProductData]
 }
 
 struct ProductData: Decodable {

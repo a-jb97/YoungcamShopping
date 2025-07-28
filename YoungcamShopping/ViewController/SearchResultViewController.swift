@@ -7,9 +7,15 @@
 
 import UIKit
 import SnapKit
+import Alamofire
 import Kingfisher
 
 class SearchResultViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+    var productInfoList: [ProductData] = []
+    var total = 0
+    var start = 1
+    var searchBarText: String?
+    
     let totalLabel = {
         let label = UILabel()
         
@@ -25,8 +31,23 @@ class SearchResultViewController: UIViewController, UICollectionViewDelegate, UI
     let lowPriceButton = configureSortButton(title: "  가격낮은순  ")
     
     lazy var productCollectionView = {
-        let collectionView = UICollectionView()
+        let layout = UICollectionViewFlowLayout()
+        let deviceWidth = UIScreen.main.bounds.width
+        let cellWidth = deviceWidth
         
+        layout.itemSize = CGSize(width: cellWidth/2.5, height: cellWidth/1.5)
+        layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 20
+        layout.scrollDirection = .vertical
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(SearchResultCollectionViewCell.self, forCellWithReuseIdentifier: SearchResultCollectionViewCell.identifier)
+        
+        collectionView.collectionViewLayout = layout
         collectionView.backgroundColor = .black
         
         return collectionView
@@ -35,27 +56,88 @@ class SearchResultViewController: UIViewController, UICollectionViewDelegate, UI
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        callRequest(query: searchBarText ?? "캠핑카", sort: "sim")
+        
         configureHierarchy()
         configureLayout()
         configureView()
         
-        totalLabel.text = "\(productInfoList.total) 개의 검색 결과"
+        accuracyButton.addTarget(self, action: #selector(accuracyButtonTapped), for: .touchUpInside)
+        dateOrderButton.addTarget(self, action: #selector(dateOrderButtonTapped), for: .touchUpInside)
+        highPriceButton.addTarget(self, action: #selector(highPriceButtonTapped), for: .touchUpInside)
+        lowPriceButton.addTarget(self, action: #selector(lowPriceButtonTapped), for: .touchUpInside)
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return productInfoList.items.count
+        return productInfoList.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchResultCollectionViewCell.identifier, for: indexPath) as! SearchResultCollectionViewCell
-        let row = productInfoList.items[indexPath.row]
+        let row = productInfoList[indexPath.row]
         
         setURLImage(url: row.image, imageView: cell.thumbnailImageView)
         cell.mallNameLabel.text = row.mallName
         cell.titleLabel.text = row.title
-        cell.lpriceLabel.text = row.lprice
+        cell.lpriceLabel.text = Int(row.lprice)?.formatted()
         
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        if indexPath.row == (productInfoList.count - 3) && start < 1000 {
+            start += 30
+            callRequest(query: searchBarText!, sort: "sim")
+        } else {
+            
+        }
+    }
+    
+    func callRequest(query: String, sort: String) {
+        let url = "https://openapi.naver.com/v1/search/shop.json?query=\(query)&display=30=10&start=\(start)&sort=\(sort)"
+        
+        let headers: HTTPHeaders = [
+            "X-Naver-Client-Id" : "4shhSTbwQvzuCGlJmy2J",
+            "X-Naver-Client-Secret" : "Up4CyWzOMf"
+        ]
+        
+        AF.request(url, method: .get, headers: headers).validate(statusCode: 200..<300).responseDecodable(of: ProductInfo.self) { response in
+            switch response.result {
+            case .success(let value):
+                self.productInfoList.removeAll()
+                self.productInfoList.append(contentsOf: value.items)
+                self.navigationItem.title = query
+                self.totalLabel.text = "\(value.total.formatted()) 개의 검색 결과"
+                self.productCollectionView.reloadData()
+                
+                if self.start == 1 {
+                    self.productCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                }
+                
+            case .failure(let error):
+                print("fail", error)
+            }
+        }
+    }
+    
+    @objc func accuracyButtonTapped() {
+        callRequest(query: searchBarText ?? "캠핑카", sort: "sim")
+        self.productCollectionView.reloadData()
+    }
+    
+    @objc func dateOrderButtonTapped() {
+        callRequest(query: searchBarText ?? "캠핑카", sort: "date")
+        self.productCollectionView.reloadData()
+    }
+    
+    @objc func highPriceButtonTapped() {
+        callRequest(query: searchBarText ?? "캠핑카", sort: "dsc")
+        self.productCollectionView.reloadData()
+    }
+    
+    @objc func lowPriceButtonTapped() {
+        callRequest(query: searchBarText ?? "캠핑카", sort: "asc")
+        self.productCollectionView.reloadData()
     }
 }
 
@@ -100,8 +182,11 @@ extension SearchResultViewController: ViewDesignProtocol {
         }
         
         productCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(accuracyButton.snp_bottomMargin).offset(8)
-            make.centerX.equalTo(view.safeAreaLayoutGuide).inset(16)
+            // make.edges.equalToSuperview()
+            make.top.equalTo(accuracyButton.snp_bottomMargin).offset(16)
+            make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.trailing.equalTo(view.safeAreaLayoutGuide).offset(16)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(8)
         }
     }
     

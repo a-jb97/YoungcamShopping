@@ -45,6 +45,11 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: self, action: nil)
+        
+        self.navigationController?.navigationBar.tintColor = .white
+        self.navigationItem.backBarButtonItem = backBarButtonItem
+        
         navigationItem.title = "영캠러의 쇼핑쇼핑"
         navigationController?.navigationBar.backgroundColor = .black
         navigationController?.navigationBar.tintColor = .white
@@ -53,36 +58,12 @@ class ViewController: UIViewController {
         configureHierarchy()
         configureLayout()
         configureView()
-        
-        callRequest(query: "캠핑카")
-    }
-    
-    func callRequest(query: String) {
-        let url = "https://openapi.naver.com/v1/search/shop.json?query=\(query)&display=100=10&start=1&sort=sim"
-        
-        let headers: HTTPHeaders = [
-            "X-Naver-Client-Id" : "4shhSTbwQvzuCGlJmy2J",
-            "X-Naver-Client-Secret" : "Up4CyWzOMf"
-        ]
-        
-        AF.request(url, method: .get, headers: headers).validate(statusCode: 200..<300).responseDecodable(of: ProductInfo.self) { response in
-            switch response.result {
-            case .success(let value):
-                productInfoList = value
-                dump(productInfoList)
-                
-            case .failure(let error):
-                print("fail", error)
-            }
-        }
-        
-        dump(#function)
     }
 }
 
 extension ViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print(#function, searchBar.text ?? "텍스트 없음")
+//        print(#function, searchBar.text ?? "텍스트 없음")
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -94,11 +75,10 @@ extension ViewController: UISearchBarDelegate {
         }
         
         // MARK: 화면 전환 필요
-        callRequest(query: text)
-        
-//        let vc = SearchResultViewController()
-//        vc.navigationController?.pushViewController(vc, animated: true)
-//        present(vc, animated: true)
+        let vc = SearchResultViewController()
+        vc.start = 1
+        vc.searchBarText = text
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
 
