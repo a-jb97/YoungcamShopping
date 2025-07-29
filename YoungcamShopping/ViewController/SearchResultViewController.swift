@@ -10,12 +10,13 @@ import SnapKit
 import Alamofire
 import Kingfisher
 
-class SearchResultViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
-    var productInfoList: [ProductData] = []
-    var total = 0
-    var start = 1
-    var searchBarText: String?
+final class SearchResultViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
     
+    var productInfoList: [ProductData] = []
+    var total: Int = 0
+    var start: Int = 1
+    var searchBarText: String?
+   
     let totalLabel = {
         let label = UILabel()
         
@@ -25,10 +26,10 @@ class SearchResultViewController: UIViewController, UICollectionViewDelegate, UI
         return label
     }()
     
-    let accuracyButton = configureSortButton(title: "  정확도  ")
-    let dateOrderButton = configureSortButton(title: "  날짜순  ")
-    let highPriceButton = configureSortButton(title: "  가격높은순  ")
-    let lowPriceButton = configureSortButton(title: "  가격낮은순  ")
+    let accuracyButton = UIButton().configureSortButton(title: "  정확도  ")
+    let dateOrderButton = UIButton().configureSortButton(title: "  날짜순  ")
+    let highPriceButton = UIButton().configureSortButton(title: "  가격높은순  ")
+    let lowPriceButton = UIButton().configureSortButton(title: "  가격낮은순  ")
     
     lazy var productCollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -52,6 +53,29 @@ class SearchResultViewController: UIViewController, UICollectionViewDelegate, UI
         
         return collectionView
     }()
+    
+//    lazy var recommandProductCollectionView = {
+//        let layout = UICollectionViewFlowLayout()
+//        let deviceWidth = UIScreen.main.bounds.width
+//        let cellWidth = deviceWidth
+//        
+//        layout.itemSize = CGSize(width: cellWidth/2.5, height: cellWidth/1.5)
+//        layout.sectionInset = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+//        layout.minimumInteritemSpacing = 0
+//        layout.minimumLineSpacing = 8
+//        layout.scrollDirection = .horizontal
+//        
+//        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+//        
+//        collectionView.delegate = self
+//        collectionView.dataSource = self
+//        collectionView.register(SearchResultCollectionViewCell.self, forCellWithReuseIdentifier: SearchResultCollectionViewCell.identifier)
+//        
+//        collectionView.collectionViewLayout = layout
+//        collectionView.backgroundColor = .black
+//        
+//        return collectionView
+//    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -73,15 +97,20 @@ class SearchResultViewController: UIViewController, UICollectionViewDelegate, UI
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchResultCollectionViewCell.identifier, for: indexPath) as! SearchResultCollectionViewCell
+        let productCell = collectionView.dequeueReusableCell(withReuseIdentifier: SearchResultCollectionViewCell.identifier, for: indexPath) as! SearchResultCollectionViewCell
+        
+//        let recommandCell = collectionView.dequeueReusableCell(withReuseIdentifier: RecommandCollectionViewCell.identifier, for: indexPath) as! RecommandCollectionViewCell
+        
         let row = productInfoList[indexPath.row]
         
-        setURLImage(url: row.image, imageView: cell.thumbnailImageView)
-        cell.mallNameLabel.text = row.mallName
-        cell.titleLabel.text = row.title
-        cell.lpriceLabel.text = Int(row.lprice)?.formatted()
+        setURLImage(url: row.image, imageView: productCell.thumbnailImageView)
+        productCell.mallNameLabel.text = row.mallName
+        productCell.titleLabel.text = row.title
+        productCell.lpriceLabel.text = Int(row.lprice)?.formatted()
         
-        return cell
+//        setURLImage(url: row.image, imageView: recommandCell.thumbnailImageView)
+        
+        return productCell
     }
     
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
@@ -105,13 +134,21 @@ class SearchResultViewController: UIViewController, UICollectionViewDelegate, UI
             switch response.result {
             case .success(let value):
                 self.productInfoList.removeAll()
+                self.start = 1
                 self.productInfoList.append(contentsOf: value.items)
                 self.navigationItem.title = query
+                self.total = value.total
                 self.totalLabel.text = "\(value.total.formatted()) 개의 검색 결과"
                 self.productCollectionView.reloadData()
-                
-                if self.start == 1 {
-                    self.productCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                                    
+                if self.productInfoList.count == 0 {
+                    self.showAlert(title: "네트워크 통신 실패", message: "네트워크 통신에 실패했습니다", ok: "확인") {
+                        print("확인 버튼 클릭")
+                    }
+                } else {
+                    if self.start == 1 {
+                        self.productCollectionView.scrollToItem(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
+                    }
                 }
                 
             case .failure(let error):
@@ -149,6 +186,7 @@ extension SearchResultViewController: ViewDesignProtocol {
         view.addSubview(highPriceButton)
         view.addSubview(lowPriceButton)
         view.addSubview(productCollectionView)
+//        view.addSubview(recommandProductCollectionView)
     }
     
     func configureLayout() {
@@ -188,6 +226,13 @@ extension SearchResultViewController: ViewDesignProtocol {
             make.trailing.equalTo(view.safeAreaLayoutGuide).offset(16)
             make.bottom.equalTo(view.safeAreaLayoutGuide).offset(8)
         }
+        
+//        recommandProductCollectionView.snp.makeConstraints { make in
+//            make.top.equalTo(productCollectionView.snp_bottomMargin).offset(4)
+//            make.leading.equalTo(view.safeAreaLayoutGuide).offset(16)
+//            make.trailing.equalTo(view.safeAreaLayoutGuide).offset(16)
+//            make.bottom.equalTo(view.safeAreaLayoutGuide).offset(8)
+//        }
     }
     
     func configureView() {

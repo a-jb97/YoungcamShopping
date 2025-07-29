@@ -76,6 +76,7 @@ extension ViewController: UISearchBarDelegate {
         
         // MARK: 화면 전환 필요
         let vc = SearchResultViewController()
+        
         vc.start = 1
         vc.searchBarText = text
         navigationController?.pushViewController(vc, animated: true)

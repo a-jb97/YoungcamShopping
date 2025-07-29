@@ -114,6 +114,4 @@ extension SearchResultCollectionViewCell: ViewDesignProtocol {
     func configureView() {
         thumbnailImageView.contentMode = .scaleAspectFill
     }
-    
-    
 }
