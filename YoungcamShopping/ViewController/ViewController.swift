@@ -10,6 +10,8 @@ import SnapKit
 import Alamofire
 
 class ViewController: UIViewController {
+    let viewModel = MainViewModel()
+    
     let productSearchBar = {
         let searchBar = UISearchBar()
         
@@ -20,7 +22,7 @@ class ViewController: UIViewController {
         searchBar.backgroundColor = .black
         
         return searchBar
-    }()
+    }() // Ob
     
     let mainImageView = {
         let imageView = UIImageView()
@@ -58,6 +60,25 @@ class ViewController: UIViewController {
         configureHierarchy()
         configureLayout()
         configureView()
+        
+        bindData()
+    }
+    
+    private func bindData() {
+        viewModel.inputSearchProduct.lazyBind {
+            print(#function)
+            
+            guard let text = self.viewModel.inputSearchProduct.value, text.count >= 2 else {
+                print("두 글자 이상 입력해주세요!")
+                return
+            }
+            
+            let vc = SearchResultViewController()
+            
+            vc.start = 1
+            vc.searchBarText = text
+            self.navigationController?.pushViewController(vc, animated: true)
+        }
     }
 }
 
@@ -66,20 +87,9 @@ extension ViewController: UISearchBarDelegate {
 //        print(#function, searchBar.text ?? "텍스트 없음")
     }
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        print(#function)
-        
-        guard let text = searchBar.text, text.count >= 2 else {
-            print("두 글자 이상 입력해주세요!")
-            return
-        }
-        
-        // MARK: 화면 전환 필요
-        let vc = SearchResultViewController()
-        
-        vc.start = 1
-        vc.searchBarText = text
-        navigationController?.pushViewController(vc, animated: true)
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { // VM : SearchButtonSelected
+        viewModel.inputSearchProduct.value = productSearchBar.text
+        bindData()
     }
 }
 

@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+class MainViewModel {
+    var inputSearchProduct: Observable<String?> = Observable(nil)
+}
