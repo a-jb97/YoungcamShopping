@@ -87,7 +87,7 @@ extension ViewController: UISearchBarDelegate {
 //        print(#function, searchBar.text ?? "텍스트 없음")
     }
     
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) { // VM : SearchButtonSelected
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         viewModel.inputSearchProduct.value = productSearchBar.text
         bindData()
     }

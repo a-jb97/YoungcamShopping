@@ -6,3 +6,14 @@
 //
 
 import Foundation
+
+enum Sorted: String {
+    case sim = "sim"
+    case date = "date"
+    case dsc = "dsc"
+    case asc = "asc"
+}
+
+class SearchResultViewModel {
+    var inputProductName: Observable<String> = Observable("")
+}
